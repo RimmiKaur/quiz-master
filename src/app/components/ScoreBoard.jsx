@@ -55,7 +55,7 @@ const ScoreBoard = () => {
           transition={{ repeat: Infinity, duration: 1, ease: "easeInOut" }}
           className="text-yellow-400 font-extrabold"
         >
-          {score} / 5
+          {score} / 10
         </motion.span>
       </motion.p>
 
@@ -73,7 +73,7 @@ const ScoreBoard = () => {
                 className="py-3 flex flex-col sm:flex-row justify-between items-center px-4 bg-gray-800 bg-opacity-50  shadow-md hover:scale-105 transition-all"
               >
                 <span className="text-sm sm:text-md">{entry.date}</span>
-                <span className="font-bold text-yellow-300 text-lg">{entry.score} / 5</span>
+                <span className="font-bold text-yellow-300 text-lg">{entry.score} / 10</span>
                 <button
                   onClick={() => router.push(`/view-result?id=${entry.id}`)}
                   className="mt-2 sm:mt-0 px-3 py-1 bg-blue-500 text-white rounded-md text-sm hover:bg-blue-600 transition-all"
