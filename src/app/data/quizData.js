@@ -1,40 +1,6 @@
 export const quizData = [
     // Multiple-Choice Questions (5 Questions)
-    {
-        category: "Integer-Type",
-        type: "text",
-        question: "What is the value of 12 + 28?",
-        answer: "40",
-        explanation: "12 + 28 equals 40.",
-      },
-      {
-        category: "Integer-Type",
-        type: "text",
-        question: "How many states are there in the United States?",
-        answer: "50",
-        explanation: "There are 50 states in the USA.",
-      },
-      {
-        category: "Integer-Type",
-        type: "text",
-        question: "In which year was the Declaration of Independence signed?",
-        answer: "1776",
-        explanation: "It was signed on July 4, 1776.",
-      },
-      {
-        category: "Integer-Type",
-        type: "text",
-        question: "What is the value of pi rounded to the nearest integer?",
-        answer: "3",
-        explanation: "The mathematical constant pi (π) rounds to 3.",
-      },
-      {
-        category: "Integer-Type",
-        type: "text",
-        question: "If a car travels at 60 mph for 2 hours, how many miles does it travel?",
-        answer: "120",
-        explanation: "60 mph * 2 hours = 120 miles.",
-      },
+    
       {
       category: "Multiple-Choice",
       type: "mcq",
@@ -76,6 +42,41 @@ export const quizData = [
       explanation: "Filtration is not a part of petroleum refining; it's a separation method used for solids and liquids.",
     },
   
+    {
+        category: "Integer-Type",
+        type: "text",
+        question: "What is the value of 12 + 28?",
+        answer: "40",
+        explanation: "12 + 28 equals 40.",
+      },
+      {
+        category: "Integer-Type",
+        type: "text",
+        question: "How many states are there in the United States?",
+        answer: "50",
+        explanation: "There are 50 states in the USA.",
+      },
+      {
+        category: "Integer-Type",
+        type: "text",
+        question: "In which year was the Declaration of Independence signed?",
+        answer: "1776",
+        explanation: "It was signed on July 4, 1776.",
+      },
+      {
+        category: "Integer-Type",
+        type: "text",
+        question: "What is the value of pi rounded to the nearest integer?",
+        answer: "3",
+        explanation: "The mathematical constant pi (π) rounds to 3.",
+      },
+      {
+        category: "Integer-Type",
+        type: "text",
+        question: "If a car travels at 60 mph for 2 hours, how many miles does it travel?",
+        answer: "120",
+        explanation: "60 mph * 2 hours = 120 miles.",
+      },
     // Integer-Type Questions (5 Questions)
    
   ];
