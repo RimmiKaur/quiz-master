@@ -5,52 +5,63 @@ import Timer from "../components/Timer";
 import Modal from "../components/Modal";
 import { useRouter } from "next/navigation";
 import { quizData } from "../data/quizData";
-import { saveScore, getScores } from "../utils/db"; // Import IndexedDB functions
+import { saveScore, getScores } from "../utils/db"; 
 import { motion, AnimatePresence } from "framer-motion";
 
 const Quizes = () => {
-  const [score, setScore] = useState(parseInt(sessionStorage.getItem("score"), 10) || 0);
+  const router = useRouter();
+  const [score, setScore] = useState(0); // Start with 0 instead of reading sessionStorage
   const [currentIndex, setCurrentIndex] = useState(0);
   const [selectedOption, setSelectedOption] = useState(null);
-  const [userInput, setUserInput] = useState(""); // For text input questions
+  const [userInput, setUserInput] = useState(""); 
   const [isCorrect, setIsCorrect] = useState(null);
   const [showModal, setShowModal] = useState(false);
   const [showTimerModal, setShowTimerModal] = useState(false);
   const [buttonText, setButtonText] = useState("Submit");
   const [timerKey, setTimerKey] = useState(0);
   const [submitted, setSubmitted] = useState(false);
-  const router = useRouter();
+  const [isClient, setIsClient] = useState(false);
+
+  useEffect(() => {
+    setIsClient(true); // Ensures component is mounted in browser
+    const storedScore = sessionStorage.getItem("score");
+    if (storedScore) setScore(parseInt(storedScore, 10));
+  }, []);
+
+  useEffect(() => {
+    if (isClient) {
+      sessionStorage.setItem("score", score.toString());
+    }
+  }, [score, isClient]);
 
   const currentQuestion = quizData[currentIndex];
 
-  // Sync score with sessionStorage
-  useEffect(() => {
-    if (typeof window !== "undefined") {
-      const storedScore = parseInt(sessionStorage.getItem("score"), 10) || 0;
-      setScore(storedScore);
-    }
-  }, []);
-
-  const handleAnswer = (option) => {
-    console.log("sadcasdcsdcsdcsadc",option);
+  const handleAnswer = (answer) => {
     if (currentQuestion.type === "mcq") {
-      setSelectedOption(option);
+      setSelectedOption(answer);
     } else {
-      setUserInput(option);
+      setUserInput(answer);
     }
-    setButtonText("Submit"); // Reset button text when a new answer is selected
+    setButtonText("Submit");
   };
 
   const handleSubmit = () => {
-    if ((currentQuestion.type === "mcq" && !selectedOption) || (currentQuestion.type === "text" && !userInput) || submitted) 
-      return; // Prevent duplicate submissions
+    if (
+      (currentQuestion.type === "mcq" && !selectedOption) ||
+      (currentQuestion.type === "text" && !userInput) ||
+      submitted
+    )
+      return;
 
     setSubmitted(true);
     const correctAnswer = currentQuestion.answer;
-    const isAnswerCorrect = currentQuestion.type === "mcq" ? selectedOption === correctAnswer : userInput.trim() === correctAnswer;
+    const isAnswerCorrect =
+      currentQuestion.type === "mcq"
+        ? selectedOption === correctAnswer
+        : userInput.trim() === correctAnswer;
 
     setIsCorrect(isAnswerCorrect);
-    setShowModal(true); // Show explanation modal
+    setShowModal(true);
 
     const newAnswer = {
       question: currentQuestion.question,
@@ -60,14 +71,18 @@ const Quizes = () => {
       explanation: currentQuestion.explanation,
     };
 
-    const storedAnswers = JSON.parse(sessionStorage.getItem("answers")) || [];
-    storedAnswers.push(newAnswer);
-    sessionStorage.setItem("answers", JSON.stringify(storedAnswers));
+    if (isClient) {
+      const storedAnswers = JSON.parse(sessionStorage.getItem("answers")) || [];
+      storedAnswers.push(newAnswer);
+      sessionStorage.setItem("answers", JSON.stringify(storedAnswers));
+    }
 
     if (isAnswerCorrect) {
       setScore((prevScore) => {
         const newScore = prevScore + 1;
-        sessionStorage.setItem("score", newScore.toString());
+        if (isClient) {
+          sessionStorage.setItem("score", newScore.toString());
+        }
         return newScore;
       });
     }
@@ -77,20 +92,19 @@ const Quizes = () => {
     setShowModal(false);
     setShowTimerModal(false);
     setSelectedOption(null);
-    setUserInput(""); // Reset text input field
+    setUserInput(""); 
     setIsCorrect(null);
-    setSubmitted(false); // Reset submission state
+    setSubmitted(false);
     setButtonText("Submit");
 
     if (currentIndex + 1 < quizData.length) {
       setCurrentIndex((prevIndex) => prevIndex + 1);
       setTimerKey((prevKey) => prevKey + 1);
     } else {
-      const finalScore = parseInt(sessionStorage.getItem("score"), 10) || 0;
+      const finalScore = score;
       const finalAnswers = JSON.parse(sessionStorage.getItem("answers")) || [];
 
-      // ✅ Prevent Duplicate Entry
-      if (!sessionStorage.getItem("scoreSaved")) {
+      if (isClient && !sessionStorage.getItem("scoreSaved")) {
         const previousScores = await getScores();
         const alreadySaved = previousScores.some(
           (entry) => entry.score === finalScore && JSON.stringify(entry.answers) === JSON.stringify(finalAnswers)
@@ -98,7 +112,7 @@ const Quizes = () => {
 
         if (!alreadySaved) {
           await saveScore(finalScore, finalAnswers);
-          sessionStorage.setItem("scoreSaved", "true"); // Mark as saved
+          sessionStorage.setItem("scoreSaved", "true");
         }
       }
 
@@ -106,21 +120,19 @@ const Quizes = () => {
     }
   };
 
-  // Automatically move to the next question when the timer runs out
   useEffect(() => {
     const timer = setTimeout(() => {
       if (!showModal) {
         setShowTimerModal(true);
         setTimeout(handleNextQuestion, 2000);
       }
-    }, 30000); // 30s timer
+    }, 30000); 
 
     return () => clearTimeout(timer);
   }, [currentIndex, showModal]);
 
   return (
     <div className="flex flex-col items-center p-6 bg-gradient-to-br from-blue-900 to-purple-900 min-h-screen text-white">
-      {/* Progress Bar */}
       <div className="w-full max-w-lg bg-gray-700 rounded-full h-2 mb-4">
         <div
           className="h-2 bg-yellow-400 rounded-full transition-all"
@@ -128,10 +140,8 @@ const Quizes = () => {
         ></div>
       </div>
 
-      {/* Timer */}
       <Timer key={timerKey} duration={30} onTimeUp={() => setShowTimerModal(true)} />
 
-      {/* Quiz Question with Animation */}
       <AnimatePresence mode="wait">
         <motion.div
           key={currentIndex}
@@ -141,7 +151,7 @@ const Quizes = () => {
           transition={{ duration: 0.5 }}
           className="w-full max-w-lg"
         >
-          <QuizQuestion
+         <QuizQuestion
             question={currentQuestion.question}
             type={currentQuestion.type}
             options={currentQuestion.options}
@@ -150,16 +160,20 @@ const Quizes = () => {
             setUserInput={setUserInput}
             onAnswer={handleAnswer}
             questionType={currentQuestion.category}
-          />
+            />
         </motion.div>
       </AnimatePresence>
 
-      {/* Submit Button with Animation */}
       <motion.button
-        disabled={(currentQuestion.type === "mcq" && !selectedOption) || (currentQuestion.type === "text" && !userInput) || submitted} // Disable after submission
+        disabled={
+          (currentQuestion.type === "mcq" && !selectedOption) ||
+          (currentQuestion.type === "text" && !userInput) ||
+          submitted
+        }
         onClick={handleSubmit}
         className={`mt-4 px-6 py-3 font-semibold text-white rounded-lg transition-all duration-300 shadow-lg ${
-          (currentQuestion.type === "mcq" && selectedOption) || (currentQuestion.type === "text" && userInput)
+          (currentQuestion.type === "mcq" && selectedOption) ||
+          (currentQuestion.type === "text" && userInput)
             ? "bg-yellow-500 hover:bg-yellow-600 hover:scale-105"
             : "bg-gray-500 cursor-not-allowed"
         }`}
@@ -169,7 +183,6 @@ const Quizes = () => {
         {buttonText}
       </motion.button>
 
-      {/* Modals */}
       {showModal && (
         <Modal
           title={isCorrect ? "Correct!" : "Incorrect!"}
