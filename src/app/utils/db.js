@@ -26,8 +26,21 @@ export const saveScore = async (score, answers) => {
 
 export const getScores = async () => {
   const db = await initDB();
-  return await db.getAll(STORE_NAME);
+  const scores = await db.getAll(STORE_NAME);
+
+  console.log("Fetched scores from IndexedDB:", scores);
+
+  // ✅ If IndexedDB is empty, clear sessionStorage
+  if (!scores || scores.length === 0) {
+    console.warn("No scores found in IndexedDB. Clearing sessionStorage...");
+    sessionStorage.removeItem("scoreSaved");
+    sessionStorage.removeItem("answers");
+    sessionStorage.removeItem("score");
+  }
+
+  return scores;
 };
+
 
 export const getScoreById = async (id) => {
   const db = await initDB();

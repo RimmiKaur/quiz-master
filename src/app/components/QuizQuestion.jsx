@@ -7,7 +7,6 @@ const QuizQuestion = ({
   setUserInput, 
   questionType 
 }) => {
-  console.log("dsfsdfdsfsdfsdfdf", questionType);
   return (
     <div className="p-6 md:p-8 border border-gray-300 rounded-lg shadow-lg bg-white dark:bg-gray-800 text-center transition-transform duration-300 hover:scale-[1.03]">
       {/* Question Text */}

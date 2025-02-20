@@ -14,7 +14,6 @@ const ScoreBoard = () => {
   const [animateScore, setAnimateScore] = useState(false);
 
   useEffect(() => {
-    console.log("Score Query:", queryScore);
     const storedScore = sessionStorage.getItem("score") || queryScore || "0";
     const storedAnswers = JSON.parse(sessionStorage.getItem("answers")) || [];
 

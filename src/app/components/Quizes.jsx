@@ -109,6 +109,11 @@ const Quizes = () => {
         const alreadySaved = previousScores.some(
           (entry) => entry.score === finalScore && JSON.stringify(entry.answers) === JSON.stringify(finalAnswers)
         );
+        if ((!previousScores || previousScores.length === 0) && finalAnswers.length === 0) {
+            sessionStorage.removeItem("scoreSaved");
+            sessionStorage.removeItem("answers");
+            sessionStorage.removeItem("score");
+          }
 
         if (!alreadySaved) {
           await saveScore(finalScore, finalAnswers);
@@ -125,19 +130,23 @@ const Quizes = () => {
       if (!showModal) {
         setShowTimerModal(true);
         setTimeout(handleNextQuestion, 2000);
+        
       }
-    }, 30000); 
+    }, 100); 
 
     return () => clearTimeout(timer);
   }, [currentIndex, showModal]);
 
   return (
-    <div className="flex flex-col items-center p-6 bg-gradient-to-br from-blue-900 to-purple-900 min-h-screen text-white">
-      <div className="w-full max-w-lg bg-gray-700 rounded-full h-2 mb-4">
+    <div className="flex  flex-col items-center p-6 bg-gradient-to-br from-blue-900 to-purple-900 min-h-screen text-white">
+      <div className="w-full relative max-w-lg bg-gray-700 rounded-full h-2 mb-4">
         <div
           className="h-2 bg-yellow-400 rounded-full transition-all"
           style={{ width: `${((currentIndex + 1) / quizData.length) * 100}%` }}
         ></div>
+        <div className="absolute top-8 right-0 bg-black px-5 py-2">
+            Score: {score} /10
+        </div>
       </div>
 
       <Timer key={timerKey} duration={30} onTimeUp={() => setShowTimerModal(true)} />
@@ -186,7 +195,13 @@ const Quizes = () => {
       {showModal && (
         <Modal
           title={isCorrect ? "Correct!" : "Incorrect!"}
-          message={`The correct answer is: ${currentQuestion.answer}. Explanation: ${currentQuestion.explanation}`}
+          message={
+            <>
+              <span>The correct answer is: <strong>{currentQuestion.answer}</strong></span>
+              <br />
+              <span className="font-bold">{currentQuestion.explanation}</span>
+            </>
+          }
           onClose={handleNextQuestion}
         />
       )}
