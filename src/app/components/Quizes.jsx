@@ -132,7 +132,7 @@ const Quizes = () => {
         setTimeout(handleNextQuestion, 2000);
         
       }
-    }, 100); 
+    }, 30000); 
 
     return () => clearTimeout(timer);
   }, [currentIndex, showModal]);
